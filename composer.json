@@ -12,6 +12,7 @@
             "yangweijie\\SM4GCM\\Tests\\": "tests/"
         }
     },
+    "license": "MIT",
     "authors": [
         {
             "name": "yangweijie",
