@@ -1,0 +1,40 @@
+{
+    "name": "yangweijie/sm4-gcm",
+    "description": "PHP implementation of SM4-GCM authenticated encryption",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "yangweijie\\SM4GCM\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "yangweijie\\SM4GCM\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "yangweijie",
+            "email": "917647288@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.4",
+        "ext-openssl": "*"
+    },
+    "require-dev": {
+        "pestphp/pest": "1.21",
+        "pestphp/pest-plugin": "^1.1"
+    },
+    "scripts": {
+        "test": "pest",
+        "test-coverage": "pest --coverage"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
