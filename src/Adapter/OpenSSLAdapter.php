@@ -16,6 +16,52 @@ class OpenSSLAdapter
 {
     public const SUPPORTED_KEY_LENGTHS = [16]; // 128 bits
     public const SUPPORTED_TAG_LENGTHS = [4, 8, 12, 13, 14, 15, 16]; // 32-128 bits in bytes
+    private static ?bool $sm4gcmSupported = null;
+
+    /**
+     * Check if SM4-GCM is supported by the current PHP installation.
+     *
+     * @return bool True if supported, false otherwise
+     */
+    public static function isSM4GCMSupported(): bool
+    {
+        if (self::$sm4gcmSupported !== null) {
+            return self::$sm4gcmSupported;
+        }
+
+        // Check if OpenSSL extension is loaded
+        if (!extension_loaded('openssl')) {
+            self::$sm4gcmSupported = false;
+            return false;
+        }
+
+        // Check if SM4-GCM is in the cipher methods list
+        $methods = openssl_get_cipher_methods();
+        if (!in_array('sm4-gcm', $methods)) {
+            self::$sm4gcmSupported = false;
+            return false;
+        }
+
+        // Try to actually use SM4-GCM to verify it works
+        // This is necessary because some PHP installations may list SM4-GCM
+        // in the methods list but not actually support it
+        $key = str_repeat("\x00", 16);
+        $iv = str_repeat("\x00", 12);
+        $plaintext = "test";
+        $tag = '';
+
+        $ciphertext = openssl_encrypt(
+            $plaintext,
+            'sm4-gcm',
+            $key,
+            OPENSSL_RAW_DATA,
+            $iv,
+            $tag
+        );
+
+        self::$sm4gcmSupported = ($ciphertext !== false);
+        return self::$sm4gcmSupported;
+    }
 
     /**
      * Encrypt plaintext using OpenSSL SM4-GCM.
@@ -56,6 +102,15 @@ class OpenSSLAdapter
                     implode(', ', self::SUPPORTED_TAG_LENGTHS),
                     $tagLength
                 )
+            );
+        }
+
+        // Check if SM4-GCM is actually supported
+        if (!self::isSM4GCMSupported()) {
+            throw new EncryptionException(
+                "SM4-GCM is not supported by the current PHP installation. " .
+                "This may be due to a PHP version or OpenSSL extension limitation. " .
+                "Please use the built-in implementation instead."
             );
         }
 
@@ -107,6 +162,15 @@ class OpenSSLAdapter
                     implode(', ', self::SUPPORTED_KEY_LENGTHS),
                     strlen($key)
                 )
+            );
+        }
+
+        // Check if SM4-GCM is actually supported
+        if (!self::isSM4GCMSupported()) {
+            throw new DecryptionException(
+                "SM4-GCM is not supported by the current PHP installation. " .
+                "This may be due to a PHP version or OpenSSL extension limitation. " .
+                "Please use the built-in implementation instead."
             );
         }
 

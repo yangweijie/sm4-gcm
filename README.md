@@ -21,6 +21,8 @@ This library provides a PHP implementation of the SM4-GCM authenticated encrypti
 - PHP 7.4 or higher
 - OpenSSL extension (recommended for better performance)
 
+Note: While the OpenSSL extension is recommended for better performance, some PHP installations may not fully support SM4-GCM even if it appears in the available cipher methods list. In such cases, the library will automatically fall back to the built-in implementation.
+
 ## Installation
 
 ### Using Composer
@@ -246,6 +248,22 @@ Compares two strings in constant time to prevent timing attacks.
 3. **Tag Verification**: Always verify the authentication tag before using decrypted data.
 4. **Side-Channel Attacks**: This implementation attempts to mitigate timing attacks through constant-time comparisons.
 
+## OpenSSL Support
+
+This library includes an OpenSSL adapter for better performance. However, some PHP installations may not fully support SM4-GCM even if it appears in the available cipher methods list.
+
+The library automatically detects whether SM4-GCM is properly supported and will fall back to the built-in implementation if needed. You can check if OpenSSL SM4-GCM is supported in your environment:
+
+```php
+use yangweijie\SM4GCM\Adapter\AdapterFactory;
+
+if (AdapterFactory::isOpenSSLSM4GCMsupported()) {
+    echo "OpenSSL SM4-GCM is supported";
+} else {
+    echo "Using built-in implementation";
+}
+```
+
 ## Testing
 
 To run the test suite:
@@ -253,6 +271,23 @@ To run the test suite:
 ```bash
 composer test
 ```
+
+### Comparison Testing
+
+This library includes a comparison testing framework that can validate the built-in implementation against an OpenSSL-based implementation. This is useful for verifying the correctness of the implementation.
+
+To run the comparison tests:
+
+```bash
+# Using the provided scripts
+cd tests/Comparison
+./run_comparison_tests.sh  # On Unix-like systems
+run_comparison_tests.bat    # On Windows systems
+```
+
+Note: The comparison tests require a PHP installation with OpenSSL SM4-GCM support. The specific PHP version mentioned in the project documentation should be used for accurate testing.
+
+If the required PHP version is not available, the tests will be skipped with an appropriate message.
 
 ## License
 

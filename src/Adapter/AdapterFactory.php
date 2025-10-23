@@ -51,9 +51,9 @@ class AdapterFactory
             return false;
         }
 
-        // Check if SM4-GCM is supported
-        $methods = openssl_get_cipher_methods();
-        return in_array('sm4-gcm', $methods);
+        // Use the OpenSSLAdapter's method to check SM4-GCM support
+        // This includes an actual test of the functionality, not just checking the methods list
+        return \yangweijie\SM4GCM\Adapter\OpenSSLAdapter::isSM4GCMSupported();
     }
 
     /**
